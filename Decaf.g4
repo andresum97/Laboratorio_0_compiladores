@@ -1,10 +1,10 @@
 grammar Decaf;
 
 /*
- * Lexer Rules
+ * Reglas lexicas
  */
 
-// Keyword specification
+// Palabras clave
 
 IF                  : 'if';
 
@@ -22,18 +22,17 @@ CHAR                : 'char';
 
 STRING              : 'string';
 
-CALLOUT             : 'callout';
 
-// Symbol Specification
+// Simbolos de apostrofe y comillas
 
 QUOTES              : '"';
 
 APOSTROPHE          : '\'';
 
 
-// Variable names & literal specification
+// Nombres de variables
 
-ID                  : ALPHA ALPHA_NUM*; // for variable name
+ID                  : ALPHA ALPHA_NUM*; 
 
 ALPHA      : [a-zA-Z_];
 
@@ -53,11 +52,9 @@ ALPHA_NUM           : ALPHA | DIGIT;
 
 HEX_DIGIT  : '0'[xX]([0-9] | [a-fA-F]);
 
-LINE_COMMENT        : '//' .*? '\n' -> skip; // skip single line comments starting from // and ending with new line
+LINE_COMMENT        : '//' .*? '\n' -> skip;
 
-COMMENT             : '/*' .*? '*/' -> skip; // skip mutliple comments
-
-//SPACE               : ' ' -> skip; // ignore spaces
+COMMENT             : '/*' .*? '*/' -> skip; 
 
 NEWLINE				: ('\r'? '\n' | '\r')+ -> skip;
 
@@ -78,6 +75,8 @@ field_var           : var_id | array_id;
 
 var_id              : ID;
 
+structDeclaration   : 'struct' var_id '{' vardeclr* '}';
+
 method_declr        : return_type method_name '(' ((var_type var_id) (',' var_type var_id)*)? ')' block;
 
 return_type         : (var_type | 'void');
@@ -91,16 +90,14 @@ statement           : location assign_op expr
                     | WHILE '(' expr ')' block
                     | var_id '=' expr ';'
                     | 'return' expr ';'
-                    // ending value can be a variable or integer literal
                     | FOR '(' var_id ('=' int_literal)? ',' ((var_id ('=' int_literal)?) | int_literal) ')' block
                     | BREAK ';';
 
-// intermediate rule for method call
 method_call_inter   : method_name '(' (expr (',' expr)*)? ')';
 
 method_call         : method_call_inter
                     | method_call_inter ';'
-                    | CALLOUT '(' STRING_LITERAL (',' callout_arg (',' callout_arg)*)? ')' ';';
+                    | 'callout' '(' STRING_LITERAL (',' callout_arg (',' callout_arg)*)? ')' ';';
 
 expr                : location
                     | literal
@@ -136,6 +133,5 @@ assign_op           : '='
 
 method_name         : ID;
 
-// recognize the whitespace at the end to prevent string concatenation due to elemination of all sapces
 WHITESPACE			: [ \t\r\n] -> skip ;
 
