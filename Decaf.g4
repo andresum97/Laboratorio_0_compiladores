@@ -12,25 +12,15 @@ ELSE                : 'else';
 
 FOR                 : 'for';
 
-RETURN              : 'return';
+WHILE               : 'while';
 
 BREAK               : 'break';
 
 CONTINUE            : 'continue';
 
-BOOLEAN             : 'boolean';
-
 CHAR                : 'char';
 
-INT                 : 'int';
-
 STRING              : 'string';
-
-TRUE                : 'True';
-
-FALSE               : 'False';
-
-VOID                : 'void';
 
 CALLOUT             : 'callout';
 
@@ -55,7 +45,7 @@ DIGIT      : [0-9];
 
 HEX_LITERAL         : '0'[xX][0-9a-fA-F]+;
 
-BOOL_LITERAL        : TRUE | FALSE;
+BOOL_LITERAL        : 'True' | 'False';
 
 STRING_LITERAL      : '"' ( '\\' [btnfr"'\\] | ~[\r\n\\"] )* '"';
 
@@ -90,7 +80,7 @@ var_id              : ID;
 
 method_declr        : return_type method_name '(' ((var_type var_id) (',' var_type var_id)*)? ')' block;
 
-return_type         : (var_type | VOID);
+return_type         : (var_type | 'void');
 
 block               : '{' vardeclr* statement* '}';
 
@@ -98,10 +88,11 @@ statement           : location assign_op expr
                     | location assign_op expr ';'
                     | method_call
                     | IF '(' expr ')' block (ELSE block)?
+                    | WHILE '(' expr ')' block
                     | var_id '=' expr ';'
-                    | RETURN expr ';'
+                    | 'return' expr ';'
                     // ending value can be a variable or integer literal
-                    | FOR var_id ('=' int_literal)? ',' ((var_id ('=' int_literal)?) | int_literal) block
+                    | FOR '(' var_id ('=' int_literal)? ',' ((var_id ('=' int_literal)?) | int_literal) ')' block
                     | BREAK ';';
 
 // intermediate rule for method call
@@ -137,7 +128,7 @@ bin_op              : arith_op | rel_op | eq_op | cond_op;
 
 arith_op            : '+' | '-' | '*' | '/' | '%';
 
-var_type            : INT | BOOLEAN;
+var_type            : 'int' | 'boolean';
 
 assign_op           : '='
                     | '+='
