@@ -63,21 +63,23 @@ NEWLINE				: ('\r'? '\n' | '\r')+ -> skip;
  * Parser Rules
  */
 
-program		    : 'class Program{' field_declr* method_declr* '}';
+program		    : 'class' 'Program' '{' (declaration)* '}';
+
+declaration     : structDeclaration | method_declr | field_declr | vardeclr ;
 
 vardeclr            : (var_type field_var) (',' var_type field_var)* ';';
 
 field_declr         : var_type field_var (',' field_var)* ';';
 
-array_id            : ID '[' int_literal ']';
+array_id            : ID '[' literal ']';
 
 field_var           : var_id | array_id;
 
 var_id              : ID;
 
-structDeclaration   : 'struct' var_id '{' vardeclr* '}';
+structDeclaration   : 'struct' var_id '{' (vardeclr)* '}' ';';
 
-method_declr        : return_type method_name '(' ((var_type var_id) (',' var_type var_id)*)? ')' block;
+method_declr        : return_type method_name '(' ((var_type (var_id)?) (',' var_type var_id)*)? ')' block;
 
 return_type         : (var_type | 'void');
 
@@ -88,7 +90,7 @@ statement           : location assign_op expr
                     | method_call
                     | IF '(' expr ')' block (ELSE block)?
                     | WHILE '(' expr ')' block
-                    | var_id '=' expr ';'
+                    | location '=' expr ';'
                     | 'return' expr ';'
                     | FOR '(' var_id ('=' int_literal)? ',' ((var_id ('=' int_literal)?) | int_literal) ')' block
                     | BREAK ';';
@@ -107,7 +109,7 @@ expr                : location
                     | '!' expr
                     | '(' expr ')';
 
-location            : var_id | array_id;
+location            : (var_id | array_id )('.' location)?;
 
 callout_arg         : expr | STRING_LITERAL;
 
@@ -119,13 +121,13 @@ eq_op               : '==' | '!=';
 
 cond_op             : '&&' | '||';
 
-literal             : int_literal | CHAR_LITERAL | BOOL_LITERAL;
+literal             : int_literal | CHAR_LITERAL | BOOL_LITERAL | var_id;
 
 bin_op              : arith_op | rel_op | eq_op | cond_op;
 
 arith_op            : '+' | '-' | '*' | '/' | '%';
 
-var_type            : 'int' | 'boolean';
+var_type            : 'int' | 'boolean' | 'void' | 'struct' var_id | structDeclaration;
 
 assign_op           : '='
                     | '+='
